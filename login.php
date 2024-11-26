@@ -3,7 +3,7 @@
 require "connect.php";
 session_start();
 
-if ($_SERVER ["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST["id"];
     $password = $_POST['password'];
 
@@ -37,24 +37,28 @@ if ($_SERVER ["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Login</title>
 </head>
 
 <body>
-    <h2>Login</h2>
-    <form action="" method="post">
-        <div class="input-group">
-            <label for="id">User ID:</label>
-            <input type="text" id="id" name="id" required>
+    <div class="login-container">
+        <div class="login-form">
+            <h2>Login</h2>
+            <form action="" method="post">
+                <div class="input-group">
+                    <input type="text" id="id" name="id" placeholder="User ID" required><i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required><i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <p>Belum punya akun? <a href="register.php">Buat akun disini</a></p>
         </div>
-        <div class="input-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-    <p>Belum punya akun? <a href="register.php">Buat akun disini</a></p>
+    </div>
+
 </body>
 
 </html>

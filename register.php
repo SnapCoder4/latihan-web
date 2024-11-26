@@ -4,7 +4,8 @@ require "connect.php";
 session_start();
 
 // Fungsi untuk menghasilkan ID acak yang unik
-function generateUniqueID($conn) {
+function generateUniqueID($conn)
+{
     do {
         // Generate ID acak antara 100 hingga 999
         $randomID = rand(000, 999);
@@ -24,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $alamat = $_POST['alamat'];
     $telepon = $_POST['telepon'];
     $id = generateUniqueID($conn);
-    
+
     // Cek apakah email sudah terdaftar
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -62,41 +63,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/register.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Register</title>
 </head>
+
 <body>
-    <h2>Buat Akun</h2>
-    <form action="" method="post" enctype="multipart/form-data">
-        <div class="input-group">
-            <label for="email"><i class="fa-solid fa-envelope"></i>Email</label>
-            <input type="email" id="email" name="email" required>
+    <div class="register-container">
+        <div class="register-form">
+            <h2>Register</h2>
+            <form action="" method="post" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Email" required><i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required><i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="nama" name="nama" placeholder="Nama" required><i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="alamat" name="alamat" placeholder="Alamat" required><i class="fa-solid fa-house"></i>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="telepon" name="telepon" placeholder="Telepon" required><i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="input-group">
+                    <input type="file" id="foto" name="foto" accept=".jpg, .jpeg, .png" required><i class="fa-solid fa-image"></i>
+                </div>
+                <button type="submit" class="btn btn-primary">Daftar</button>
+            </form>
+            <p>Sudah punya akun? <a href="login.php">Masukkan akun disini</a></p>
         </div>
-        <div class="input-group">
-            <label for="password"><i class="fa-solid fa-lock"></i>Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div class="input-group">
-            <label for="nama"><i class="fa-solid fa-user"></i>Nama:</label>
-            <input type="text" id="nama" name="nama" required>
-        </div>
-        <div class="input-group">
-            <label for="alamat"><i class="fa-solid fa-house"></i>Alamat:</label>
-            <input type="text" id="alamat" name="alamat" required>
-        </div>
-        <div class="input-group">
-            <label for="telepon"><i class="fa-solid fa-phone"></i>Telepon</label>
-            <input type="text" id="telepon" name="telepon" required>
-        </div>
-        <div class="input-group">
-            <label for="foto"><i class="fa-solid fa-image"></i>Foto:</label>
-            <input type="file" id="foto" name="foto" accept=".jpg, .jpeg, .png" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Daftar</button>
-    </form>
-    <p>Sudah punya akun? <a href="login.php">Masukkan akun disini</a></p>
+    </div>
 </body>
+
 </html>
