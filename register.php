@@ -3,19 +3,19 @@
 require "connect.php";
 session_start();
 
-// Fungsi untuk menghasilkan ID acak yang unik
+$message = ""; // Variabel untuk menyimpan pesan
+
 function generateUniqueID($conn)
 {
     do {
-        // Generate ID acak antara 100 hingga 999
-        $randomID = rand(000, 999);
-        // Cek apakah ID sudah ada di database
+        // Generate ID acak antara 0000 hingga 9999
+        $randomID = rand(0, 9999);
         $stmt = $conn->prepare("SELECT id FROM users WHERE id = ?");
         $stmt->bind_param("s", $randomID);
         $stmt->execute();
         $result = $stmt->get_result();
     } while ($result->num_rows > 0); // Ulangi jika ID sudah ada
-    return str_pad($randomID, 3, '0', STR_PAD_LEFT); // Kembalikan ID dalam format 3 digit
+    return $randomID;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "Email sudah terdaftar, silakan gunakan email lain.";
+        $message = "Email sudah terdaftar, silakan gunakan email lain.";
     } else {
         $target_dir = "foto/";
         $target_file = $target_dir . basename($_FILES["foto"]["name"]);
@@ -46,20 +46,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("sssssss", $id, $email, $password, $nama, $alamat, $telepon, $target_file);
                 if ($stmt->execute()) {
-                    echo "Pendaftaran berhasil! ID kamu adalah $id";
+                    $message = "<div class='success-message'> 
+                                  <p>Pendaftaran berhasil! ID kamu adalah <span class='id-highlight'>$id</span></p>
+                                </div>";
                 } else {
-                    echo "Pendaftaran gagal";
+                    $message = "Pendaftaran gagal.";
                 }
             } else {
-                echo "Terjadi kesalahan saat mengupload gambar.";
+                $message = "Terjadi kesalahan saat mengupload gambar.";
             }
         } else {
-            echo "Hanya format JPG, JPEG, dan PNG yang diizinkan.";
+            $message = "Hanya format JPG, JPEG, dan PNG yang diizinkan.";
         }
     }
     $stmt->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,25 +78,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="register-container">
         <div class="register-form">
+            <?php if (!empty($message)): ?>
+                <div class="alert">
+                    <?php echo $message; ?>
+                </div>
+            <?php endif; ?>
             <h2>Register</h2>
             <form action="" method="post" enctype="multipart/form-data">
                 <div class="input-group">
-                    <input type="email" id="email" name="email" placeholder="Email" required><i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="Email" required><i
+                        class="fa-solid fa-envelope"></i>
                 </div>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" placeholder="Password" required><i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" name="password" placeholder="Password" required><i
+                        class="fa-solid fa-lock"></i>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="nama" name="nama" placeholder="Nama" required><i class="fa-solid fa-user"></i>
+                    <input type="text" id="nama" name="nama" placeholder="Nama" required><i
+                        class="fa-solid fa-user"></i>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="alamat" name="alamat" placeholder="Alamat" required><i class="fa-solid fa-house"></i>
+                    <input type="text" id="alamat" name="alamat" placeholder="Alamat" required><i
+                        class="fa-solid fa-house"></i>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="telepon" name="telepon" placeholder="Telepon" required><i class="fa-solid fa-phone"></i>
+                    <input type="text" id="telepon" name="telepon" placeholder="Telepon" required><i
+                        class="fa-solid fa-phone"></i>
                 </div>
                 <div class="input-group">
-                    <input type="file" id="foto" name="foto" accept=".jpg, .jpeg, .png" required><i class="fa-solid fa-image"></i>
+                    <input type="file" id="foto" name="foto" accept=".jpg, .jpeg, .png" required><i
+                        class="fa-solid fa-image"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">Daftar</button>
             </form>
