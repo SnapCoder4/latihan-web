@@ -3,23 +3,25 @@
 require "connect.php";
 session_start();
 
+$error = ""; 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST["id"];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE id = ? AND password = ?");
-    $stmt->bind_param("ss", $id, $password);
+    $stmt = $conn->prepare("SELECT id, password FROM users WHERE id = ?");
+    $stmt->bind_param("s", $id);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        // Bind hasil
         $stmt->bind_result($db_id, $db_password);
         $stmt->fetch();
 
-        if ($id == $db_id && $password == $db_password) {
-            $_SESSION['id'] = $id;
-            header("Location: index.php");
+        // Verifikasi password menggunakan password_verify
+        if (password_verify($password, $db_password)) {
+            $_SESSION['id'] = $db_id; 
+            header("Location: dashboard.php"); 
             exit();
         } else {
             $error = "Nomor ID atau Password salah";
@@ -27,8 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error = "ID tidak ditemukan.";
     }
+    $stmt->close();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +48,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="login-container">
         <div class="login-form">
             <h2>Login</h2>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger">
+                    <?php echo $error; ?>
+                </div>
+            <?php endif; ?>
             <form action="" method="post">
                 <div class="input-group">
                     <input type="text" id="id" name="id" placeholder="User ID" required><i class="fa-solid fa-user"></i>
@@ -56,9 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
             <p>Belum punya akun? <a href="register.php">Buat akun disini</a></p>
-        </div>
+        </div><p><a href="forgot_password.php">Lupa password?</a></p>
     </div>
-
 </body>
 
 </html>

@@ -42,9 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Cek format file
         if (in_array($imageFileType, ['jpg', 'jpeg', 'png'])) {
             if (move_uploaded_file($_FILES["foto"]["tmp_name"], $target_file)) {
+                $password_hashed = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $conn->prepare("INSERT INTO users (id, email, password, nama, alamat, telepon, foto) 
                                         VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssssss", $id, $email, $password, $nama, $alamat, $telepon, $target_file);
+                $stmt->bind_param("sssssss", $id, $email, $password_hashed, $nama, $alamat, $telepon, $target_file);
                 if ($stmt->execute()) {
                     $message = "<div class='success-message'> 
                                   <p>Pendaftaran berhasil! ID kamu adalah <span class='id-highlight'>$id</span></p>
