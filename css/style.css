@@ -242,3 +242,34 @@ main {
 .description {
     margin: 10px 0;
 }
+
+/* Styling for tables */
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.transaction-table th, .transaction-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.transaction-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.transaction-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Alert box for no data */
+.alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+}
