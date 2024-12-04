@@ -1,6 +1,6 @@
 <?php
 
-require "connect.php";
+require "db_connection.php";
 session_start();
 
 $error = ""; 
