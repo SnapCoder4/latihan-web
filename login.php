@@ -1,27 +1,30 @@
 <?php
-
 require "db_connection.php";
 session_start();
 
-$error = ""; 
+$error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST["id"];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, password, nama, foto FROM users WHERE id = ?");
     $stmt->bind_param("s", $id);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($db_id, $db_password);
+        $stmt->bind_result($db_id, $db_password, $db_nama, $db_foto);
         $stmt->fetch();
 
         // Verifikasi password menggunakan password_verify
         if (password_verify($password, $db_password)) {
-            $_SESSION['id'] = $db_id; 
-            header("Location: dashboard.php"); 
+            // Simpan informasi user di session
+            $_SESSION['id'] = $db_id;
+            $_SESSION['nama'] = $db_nama;
+            $_SESSION['foto'] = $db_foto;
+
+            header("Location: dashboard.php");
             exit();
         } else {
             $error = "Nomor ID atau Password salah";
@@ -63,7 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
             <p>Belum punya akun? <a href="register.php">Buat akun disini</a></p>
-        </div><p><a href="forgot_password.php">Lupa password?</a></p>
+        </div>
+        <p><a href="forgot_password.php">Lupa password?</a></p>
     </div>
 </body>
 

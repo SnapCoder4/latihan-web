@@ -51,7 +51,13 @@ $conn->close();
 <body>
     <header>
         <h1>Detail Produk</h1>
+        <button id="modeToggle" title="Toggle Mode">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
     </header>
+
+
 
     <main>
         <section class="product-detail">

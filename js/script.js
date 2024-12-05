@@ -26,6 +26,38 @@ function toggleSidebar() {
         // Toggle kelas 'collapsed' untuk sidebar, header, dan content
         sidebar.classList.toggle('collapsed');
         content.classList.toggle('collapsed');
-        header.classList.toggle('collapsed'); 
+        header.classList.toggle('collapsed');
     });
+
 }
+
+function searchProducts() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const productGrid = document.getElementById('productGrid');
+    const cards = productGrid.getElementsByClassName('card');
+
+    for (let i = 0; i < cards.length; i++) {
+        const title = cards[i].getElementsByClassName('details')[0].getElementsByTagName('h3')[0];
+        if (title) {
+            const txtValue = title.textContent || title.innerText;
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+    }
+}
+
+function confirmLogout(event) {
+    event.preventDefault(); // Mencegah tautan logout langsung dieksekusi
+    const confirmed = confirm("Apakah Anda yakin ingin logout?");
+    if (confirmed) {
+        window.location.href = 'logout.php'; // Redirect ke logout.php jika dikonfirmasi
+    }
+}
+
+
+
+

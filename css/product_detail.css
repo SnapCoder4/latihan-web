@@ -156,3 +156,28 @@ button:hover {
     background-color: #5a6268;
     transform: translateY(-2px); /* Efek tombol terangkat saat hover */
 }
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #343a40; /* Latar belakang gelap */
+    color: #f8f9fa; /* Teks putih */
+}
+
+header.dark-mode {
+    background-color: #495057; /* Warna header untuk mode gelap */
+}
+
+.product-detail.dark-mode {
+    background-color: #495057; /* Warna detail produk untuk mode gelap */
+    color: #f8f9fa;
+}
+
+button.dark-mode {
+    background-color: #6c757d; /* Tombol mode gelap */
+    color: white;
+}
+
+button.dark-mode:hover {
+    background-color: #5a6268; /* Tombol hover mode gelap */
+}
+

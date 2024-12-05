@@ -70,16 +70,19 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/beli.css">
     <title>Pembelian</title>
 </head>
+
 <body>
     <h1>Pembelian Sukses</h1>
     <p>Terima kasih telah melakukan pembelian. Pembelian Anda telah berhasil diproses.</p>
     <p>Total Pembayaran: <?php echo formatCurrency($totalPrice); ?></p>
     <button onclick="window.location.href='dashboard.php'">Kembali ke Beranda</button>
 </body>
+
 </html>

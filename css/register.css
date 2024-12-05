@@ -129,3 +129,24 @@ p a:hover {
     margin-bottom: 20px;
     font-family: Arial, sans-serif;
 }
+
+/* Mode Gelap */
+body.dark-mode {
+    background-color: #121212; /* Latar belakang gelap */
+    color: #ffffff; /* Teks putih */
+}
+
+header.dark-mode {
+    background-color: #333; /* Header gelap */
+}
+
+.product-detail.dark-mode {
+    background-color: #1f1f1f;
+    color: #ddd;
+}
+
+/* Ubah warna teks, tombol, dll untuk menyesuaikan dengan mode gelap */
+button.dark-mode {
+    background-color: #555;
+    color: white;
+}
