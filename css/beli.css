@@ -8,14 +8,15 @@
 body {
     font-family: Arial, sans-serif;
     background-image: url('../foto/success.png');
-    background-size: cover;
+    background-size: 50%; /* Menutupi seluruh area */
+    background-position: center; /* Memposisikan gambar di tengah */
+    background-repeat: no-repeat; /* Tidak mengulang gambar */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh; /* Memastikan konten berada di tengah layar */
 }
-
 /* Kontainer pembelian */
 h1 {
     font-size: 2rem;

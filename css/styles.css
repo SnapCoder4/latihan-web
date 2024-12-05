@@ -21,7 +21,7 @@ header {
     left: 250px; 
     top: 0;
     width: calc(100% - 250px);
-    transition: left 0.3s ease;
+    transition: left 0.3s ease, width 0.3s ease;
 }
 
 header.collapsed {
@@ -501,6 +501,8 @@ body.light-mode #modeToggle i {
         font-size: 14px; /* Smaller font size on mobile */
     }
 }
+
+
 
 
 /* Dark Mode styles */
