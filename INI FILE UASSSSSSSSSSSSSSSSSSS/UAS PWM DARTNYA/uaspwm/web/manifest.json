@@ -1,6 +1,6 @@
 {
-    "name": "uaspwm",
-    "short_name": "uaspwm",
+    "name": "latlogin",
+    "short_name": "latlogin",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

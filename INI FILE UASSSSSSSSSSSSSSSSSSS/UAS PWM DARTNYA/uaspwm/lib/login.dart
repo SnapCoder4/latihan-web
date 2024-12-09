@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'register.dart';
 import 'package:flutter/material.dart';
-import 'package:uaspwm/dashboard.dart';
 import 'package:http/http.dart' as http;
+import 'register_page.dart'; // Impor halaman register
+import 'dashboard_page.dart'; // Impor halaman dashboard
+import 'forgot_password_page.dart'; // Impor halaman lupa password
 
 class LoginPage extends StatefulWidget {
   @override
@@ -10,89 +11,239 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscureText = true; // Untuk menyembunyikan/menampilkan password
+  String _message = '';
 
-  Future<void> login() async {
-    final url = Uri.parse('http://localhost/UAS_PWM/login.php');
+  Future<void> _login() async {
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    // URL endpoint API login
+    final String url = 'http://localhost/UASPWM/login.php';
 
     try {
-      final response = await http.post(url, body: {
-        'id': _idController.text,
-        'password': _passwordController.text,
-      });
-
-      // Debugging: Print the response body for analysis
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      final data = jsonDecode(response.body);
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
 
       if (response.statusCode == 200) {
-        if (data['status'] == 'success') {
-          // If login is successful, navigate to DashboardPage
+        var jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['value'] == 1) {
+          // Jika login berhasil
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => DashboardPage()),
           );
         } else {
-          // Show error message from server
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'])),
-          );
+          // Jika login gagal
+          setState(() {
+            _message = jsonResponse['message'];
+          });
         }
       } else {
-        // Handle case where server does not respond with a 200 OK status
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Server error, please try again later.')),
-        );
+        setState(() {
+          _message = 'Terjadi kesalahan, silakan coba lagi.';
+        });
       }
     } catch (e) {
-      // Handle any exceptions that occur during the HTTP request
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to login. Please try again later.')),
-      );
+      setState(() {
+        _message = 'Tidak dapat terhubung ke server.';
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _idController,
-              decoration: InputDecoration(labelText: 'ID'),
+      body: Stack(
+        children: [
+          // Gambar latar belakang
+          Container(
+            width: screenWidth,
+            height: screenHeight,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'assets/images/background.png'), // Gambar background
+                fit: BoxFit.cover,
+              ),
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
+          ),
+
+          // Konten halaman login di atas background
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo berbentuk lingkaran
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage('assets/images/logo.jpg'),
+                  ),
+                  SizedBox(height: 24),
+
+                  // TextField email dengan desain kapsul dan ikon email
+                  SizedBox(
+                    width: 300,
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.verified_user),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+
+                  // TextField password dengan ikon mata untuk menampilkan/menyembunyikan password
+                  SizedBox(
+                    width: 300,
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: _obscureText,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ),
+
+                  // Link Lupa Password di bawah isian Password
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ForgotPasswordPage()),
+                        );
+                      },
+                      child: Text(
+                        'Lupa Password?',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+
+                  // Tombol login dan register dalam satu row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _login,
+                        child: Text('Login'),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterPage()),
+                          );
+                        },
+                        child: Text('Register'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+
+                  // Pesan error
+                  Text(
+                    _message,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  SizedBox(height: 100),
+
+                  // Login dengan sosial media
+                  Text(
+                    "Atau login dengan",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage:
+                              AssetImage('assets/images/google_logo.png'),
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage:
+                              AssetImage('assets/images/facebook_logo.png'),
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage:
+                              AssetImage('assets/images/linkedin_logo.png'),
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage:
+                              AssetImage('assets/images/twitter_logo.png'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: login,
-              child: Text('Login'),
-            ),
-            SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterPage()),
-                );
-              },
-              child: Text('Belum punya akun?'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

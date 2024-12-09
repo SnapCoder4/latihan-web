@@ -1,4 +1,5 @@
 import 'login.dart';
+import 'register_page.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -8,7 +9,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'TechZone',
+      title: 'Aplikasi',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
