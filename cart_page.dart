@@ -20,7 +20,7 @@ class _CartPageState extends State<CartPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.2/lat_login/get_cart.php?user_id=${widget.userId}'),
+            '/lat_login/get_cart.php?user_id=${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
