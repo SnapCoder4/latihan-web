@@ -20,7 +20,7 @@ class _RiwayatBelanjaPageState extends State<RiwayatBelanjaPage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://192.168.1.2/lat_login/get_riwayat_belanja.php?user_id=${widget.userId}',
+          '/lat_login/get_riwayat_belanja.php?user_id=${widget.userId}',
         ),
       );
 
