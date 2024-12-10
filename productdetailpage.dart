@@ -34,7 +34,7 @@ class ProductDetailPage extends StatelessWidget {
 
       // Mengirim POST request ke server untuk menyimpan data pembelian
       final response = await http.post(
-        Uri.parse('http://192.168.1.2/lat_login/penjualan.php'),
+        Uri.parse(/lat_login/penjualan.php'),
         body: {
           'nama_produk': productName,
           'harga_produk':
