@@ -1,10 +1,9 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io'; // Untuk File
 import 'package:latlogin/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart'; // Untuk mengambil gambar
-import 'package:path_provider/path_provider.dart'; // Untuk mendapatkan path direktori
+import 'package:image_picker/image_picker.dart'; // Import Image Picker
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -18,33 +17,26 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _alamatController = TextEditingController();
   final TextEditingController _teleponController = TextEditingController();
   String _message = '';
-  File? _imageFile; // Untuk menyimpan gambar yang dipilih
+  File? _image; // Variabel untuk menyimpan foto
 
-  final ImagePicker _picker = ImagePicker();
-
-  // Fungsi untuk memilih gambar
+  // Untuk memilih gambar
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _image = File(pickedFile.path);
       });
     }
   }
 
-  // Fungsi untuk menyimpan gambar ke folder yang dapat diakses
-  Future<void> _saveImage() async {
-    if (_imageFile != null) {
-      final directory = await getApplicationDocumentsDirectory();
-      final String imageName =
-          '${_namaController.text.split(" ")[0]}.jpg'; // Ambil nama depan
-      final String newPath = '${directory.path}/$imageName'; // Path baru
-
-      // Simpan gambar ke path baru
-      await _imageFile!.copy(newPath);
-      print(
-          'Image saved to: $newPath'); // Debugging untuk memastikan penyimpanan
-    }
+  // Fungsi untuk mengkonversi gambar menjadi base64
+  String _encodeImage(File image) {
+    List<int> imageBytes = image.readAsBytesSync();
+    String base64Image = base64Encode(imageBytes);
+    return base64Image;
   }
 
   Future<void> _register() async {
@@ -54,37 +46,27 @@ class _RegisterPageState extends State<RegisterPage> {
     final alamat = _alamatController.text;
     final telepon = _teleponController.text;
 
-    await _saveImage(); // Simpan gambar sebelum registrasi
-
     var uri = Uri.parse(
         "http://localhost/UASPWM/register.php"); // Sesuaikan dengan URL API Anda
 
-    var request = http.MultipartRequest('POST', uri);
+    // Mengubah gambar menjadi base64
+    String base64Image = _image != null ? _encodeImage(_image!) : "";
 
-    // Menambahkan field ke request
-    request.fields['email'] = email;
-    request.fields['password'] = password;
-    request.fields['nama'] = nama;
-    request.fields['alamat'] = alamat;
-    request.fields['telepon'] = telepon;
-
-    // Menambahkan gambar ke request
-    if (_imageFile != null) {
-      String imageName = '${_namaController.text.split(" ")[0]}.jpg';
-      request.files.add(await http.MultipartFile.fromPath(
-          'foto', _imageFile!.path,
-          filename: imageName));
-    }
-
-    var response = await request.send();
+    var response = await http.post(uri, body: {
+      'email': email,
+      'password': password,
+      'nama': nama,
+      'alamat': alamat,
+      'telepon': telepon,
+      'foto': base64Image, // Menambahkan foto dalam format base64
+    });
 
     if (response.statusCode == 200) {
-      var responseData = await http.Response.fromStream(response);
-      var jsonData = jsonDecode(responseData.body);
+      var jsonData = jsonDecode(response.body);
 
       if (jsonData['value'] == 1) {
         setState(() {
-          _message = "Registration successful! Your ID is: ${jsonData['id']}";
+          _message = "Registration successful!";
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),
@@ -92,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
         });
       } else {
         setState(() {
-          _message = "Registration failed: ${jsonData['message']}";
+          _message = "Registration Success";
         });
       }
     } else {
@@ -117,126 +99,114 @@ class _RegisterPageState extends State<RegisterPage> {
             height: screenHeight,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/images/background.png'), // Gambar background
+                image: AssetImage('assets/images/background.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           // Form Register
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 16.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 16.0),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(Icons.lock),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 16.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 16.0),
+                      obscureText: true,
                     ),
-                    obscureText: true,
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _namaController,
-                    decoration: InputDecoration(
-                      labelText: 'Nama',
-                      prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _namaController,
+                      decoration: InputDecoration(
+                        labelText: 'Nama',
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 16.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 16.0),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _alamatController,
-                    decoration: InputDecoration(
-                      labelText: 'Alamat',
-                      prefixIcon: Icon(Icons.home),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _alamatController,
+                      decoration: InputDecoration(
+                        labelText: 'Alamat',
+                        prefixIcon: Icon(Icons.location_on),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 16.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 16.0),
                     ),
-                    minLines: 3,
-                    maxLines: 3,
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _teleponController,
-                    decoration: InputDecoration(
-                      labelText: 'Telepon',
-                      prefixIcon: Icon(Icons.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _teleponController,
+                      decoration: InputDecoration(
+                        labelText: 'Telepon',
+                        prefixIcon: Icon(Icons.phone),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 16.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 16.0),
+                      keyboardType: TextInputType.phone,
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage:
-                        _imageFile != null ? FileImage(_imageFile!) : null,
-                    child: _imageFile == null
-                        ? Icon(Icons.person, size: 50)
-                        : null,
-                  ),
-                  SizedBox(height: 16),
-                  if (_imageFile != null)
+                    SizedBox(height: 16),
+                    // Input Foto
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: Text('Pick a photo'),
+                    ),
+                    if (_image != null) ...[
+                      SizedBox(height: 16),
+                      Image.file(_image!,
+                          width: 100, height: 100, fit: BoxFit.cover),
+                    ],
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _register,
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      child: Text('Register'),
+                    ),
+                    SizedBox(height: 16),
                     Text(
-                      'Nama file: ${_namaController.text.split(" ")[0]}.jpg',
-                      style: TextStyle(fontSize: 14),
+                      _message,
+                      style: TextStyle(color: Colors.red),
                     ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
-                    child: Text('Upload Foto'),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _register,
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                    ),
-                    child: Text('Register'),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    _message,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

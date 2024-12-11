@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlogin/verification.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
@@ -10,38 +11,32 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
   String _message = '';
+  bool _isLoading = false; // Penanda untuk loading spinner
 
   Future<void> _resetPassword() async {
-    final email = _emailController.text;
+    setState(() {
+      _isLoading = true; // Mulai loading
+      _message = ''; // Reset pesan
+    });
 
-    // Validasi email
-    if (email.isEmpty) {
-      setState(() {
-        _message = "Email tidak boleh kosong.";
-      });
-      return;
-    }
-
-    // URL endpoint API untuk reset password
-    final String url = 'http://localhost/UASPWM/reset_password.php';
+    final String email = _emailController.text;
+    final String url = 'http://localhost/UASPWM/resetpassword.php';
 
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {
-          'email': email,
-        },
+        body: {'email': email},
       );
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         if (jsonResponse['value'] == 1) {
-          // Jika reset password berhasil
-          setState(() {
-            _message = "Link reset password telah dikirim ke email Anda.";
-          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => VerificationPage(email: email)),
+          );
         } else {
-          // Jika email tidak ditemukan
           setState(() {
             _message = jsonResponse['message'];
           });
@@ -55,137 +50,97 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() {
         _message = 'Tidak dapat terhubung ke server.';
       });
+    } finally {
+      setState(() {
+        _isLoading = false; // Selesai loading
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: AppBar(title: Text('Lupa Password')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Kembali ke halaman sebelumnya
+          },
+        ),
+      ),
       body: Stack(
         children: [
-          // Gambar latar belakang
           Positioned.fill(
             child: Image.asset(
               'assets/images/background.png',
-              fit: BoxFit.cover, // Mengisi seluruh latar belakang
+              fit: BoxFit.cover,
             ),
           ),
-
-          // Konten di atas gambar
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo di bagian atas
-                Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage(
-                        'assets/images/logo.jpg'), // Sesuaikan dengan path logo
-                  ),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/images/logo.jpg'),
                 ),
                 SizedBox(height: 24),
-
-                // Pesan di bawah logo, margin sama dengan input email
-                Center(
-                  child: SizedBox(
-                    width: screenWidth * 0.8,
-                    child: Text(
-                      'Lupa Password',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 40,
-                        color: Colors.black,
-                      ),
-                    ),
+                Text(
+                  'Lupa Password',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                    color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 50),
-
                 Center(
                   child: SizedBox(
-                    width: screenWidth * 0.8,
                     child: Text(
-                      'PESAN PENTING:',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 5),
-
-                Center(
-                  child: SizedBox(
-                    width: screenWidth * 0.8,
-                    child: Text(
-                      'Masukkan email Anda dan link reset password akan dikirimkan.',
+                      'Masukkan email Anda dan kode verifikasi akan dikirimkan lewat email.',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 14,
-                        color: Colors.black,
+                        color: Colors.black, // Teks berwarna putih
                       ),
                     ),
                   ),
                 ),
                 SizedBox(height: 24),
-                Center(
-                  child: SizedBox(
-                    width: screenWidth * 0.8,
-                    child: TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Masukkan Email',
-                        prefixIcon: Icon(Icons.email),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        filled: true,
-                        fillColor: Colors.white
-                            .withOpacity(0.8), // Transparansi untuk kontras
-                      ),
+                SizedBox(height: 50),
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Masukkan Email Anda',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.8),
                   ),
                 ),
                 SizedBox(height: 24),
-
-                // Tombol Reset Password
-                Center(
-                  child: SizedBox(
-                    width: screenWidth * 0.6,
-                    child: ElevatedButton(
-                      onPressed: _resetPassword,
-                      child: Text('Reset Password'),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(30), // Bentuk kapsul
+                _isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _resetPassword,
+                        child: Text('Kirim Kode'),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16),
                         ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 16), // Ukuran tinggi tombol
                       ),
-                    ),
-                  ),
-                ),
                 SizedBox(height: 16),
-                Center(
-                  child: Text(
+                if (_message.isNotEmpty)
+                  Text(
                     _message,
                     style: TextStyle(color: Colors.red),
                   ),
-                ),
               ],
             ),
           ),

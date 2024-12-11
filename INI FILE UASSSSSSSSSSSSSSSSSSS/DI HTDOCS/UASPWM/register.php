@@ -5,7 +5,7 @@ header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Menghubungkan ke database
-require 'connect.php';
+require 'db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $response = array(); // Inisialisasi array untuk respon
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         // Menggunakan prepared statement untuk menghindari SQL Injection
         // Menambahkan field "createdDate" dengan nilai default dari fungsi NOW() MySQL
-        $stmt = $connect->prepare("INSERT INTO users (id, email, password, nama, alamat, telepon, createdDate) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $connect->prepare("INSERT INTO users (id, email, password, nama, alamat, telepon ,createdDate) VALUES (?, ?, ?, ?, ?, ?, NOW())");
         $stmt->bind_param("ssssss", $id, $email, $hashed_password, $nama, $alamat, $telepon); // 's' = string
 
         // Menjalankan query

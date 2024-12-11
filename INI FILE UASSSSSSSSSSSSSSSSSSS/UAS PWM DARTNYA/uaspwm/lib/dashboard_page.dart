@@ -1,3 +1,5 @@
+import 'cart_page.dart';
+import 'RiwayatBelanjaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'login.dart'; // Impor halaman login
@@ -20,7 +22,7 @@ class _DashboardPageState extends State<DashboardPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://localhost/UASPWM/get_products.php'), // Ganti dengan URL API Anda
+            'http://localhost/UASPWM//get_products.php'), // Ganti dengan URL API Anda
       );
 
       if (response.statusCode == 200) {
@@ -86,14 +88,26 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: Icon(Icons.shopping_cart),
               title: Text('Keranjang Belanja'),
               onTap: () {
-                // Tambahkan logika untuk navigasi ke halaman keranjang belanja
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CartPage(userId: 1), // Ganti userId sesuai login
+                  ),
+                );
               },
             ),
             ListTile(
               leading: Icon(Icons.history),
               title: Text('Riwayat Belanja'),
               onTap: () {
-                // Tambahkan logika untuk navigasi ke halaman riwayat belanja
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RiwayatBelanjaPage(
+                        userId: 1), // Ganti userId sesuai login
+                  ),
+                );
               },
             ),
             ListTile(
@@ -118,7 +132,8 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                // Tambahkan logika untuk logout
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
               },
             ),
           ],
