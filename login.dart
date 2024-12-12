@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     final String email = _emailController.text;
     final String password = _passwordController.text;
     final String url =
-        'http://192.168.1.2/lat_login/login.php'; // URL API login
+        '/lat_login/login.php'; // URL API login
 
     try {
       final response = await http.post(
