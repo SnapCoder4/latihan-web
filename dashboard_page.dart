@@ -1,72 +1,114 @@
 import 'package:flutter/material.dart';
-import 'dart:convert'; // Untuk parsing JSON
+import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // Impor intl untuk memformat angka
-import 'login.dart'; // Impor halaman login
-import 'productdetailpage.dart'; // Impor halaman ProductDetailPage
-import 'RiwayatBelanjaPage.dart';
+import 'login.dart';
+import 'settings_page.dart';
 import 'cart_page.dart';
+import 'RiwayatBelanjaPage.dart';
 
 class DashboardPage extends StatefulWidget {
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+  final int userId;
+
+  DashboardPage({
+    required this.toggleTheme,
+    required this.isDarkMode,
+    required this.userId,
+  });
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
   List products = [];
-  bool isLoading = true; // Menyimpan status loading
-  String errorMessage = ''; // Menyimpan pesan error jika ada
+  bool isLoading = true;
+  String errorMessage = '';
+  String userName = "Nama Pengguna";
+  String userEmail = "email@domain.com";
+  String userPhoto = ""; // URL foto pengguna
 
-  // Fungsi untuk mengambil data produk dari API
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+    fetchProducts();
+  }
+
+  // Ambil data pengguna dari API
+  Future<void> fetchUserData() async {
+    final uri = Uri.parse(
+        'http://192.168.1.2/lat_login/get_user_data.php?user_id=${widget.userId}');
+    try {
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['value'] == 1) {
+          setState(() {
+            userName = data['nama'] ?? "Nama Pengguna";
+            userEmail = data['email'] ?? "email@domain.com";
+            userPhoto = data['foto'] ?? ""; // URL foto pengguna
+          });
+        } else {
+          setState(() {
+            errorMessage = data['message'];
+          });
+        }
+      } else {
+        print("Gagal mengambil data pengguna: ${response.body}");
+      }
+    } catch (e) {
+      print("Kesalahan jaringan saat mengambil data pengguna: $e");
+    }
+  }
+
+  // Ambil data produk dari API
   Future<void> fetchProducts() async {
     try {
       final response = await http.get(
-        Uri.parse(
-            '/lat_login/get_products.php'), // Ganti dengan URL API Anda
+        Uri.parse('http://192.168.1.2/lat_login/get_products.php'),
       );
 
       if (response.statusCode == 200) {
         setState(() {
           products = json.decode(response.body);
-          isLoading =
-              false; // Set loading ke false setelah data berhasil diambil
+          isLoading = false;
         });
       } else {
-        throw Exception('Failed to load products');
+        throw Exception('Gagal memuat produk.');
       }
     } catch (e) {
       setState(() {
-        isLoading = false; // Set loading ke false jika terjadi error
-        errorMessage = e.toString(); // Simpan pesan error
+        isLoading = false;
+        errorMessage = e.toString();
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchProducts(); // Panggil fungsi untuk mengambil data saat widget diinisialisasi
-  }
-
-  // Fungsi untuk memformat harga
-  String formatCurrency(String price) {
-    final formatter = NumberFormat.currency(locale: 'id', symbol: 'Rp ');
-    return formatter.format(int.parse(price));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard Produk'),
+        title: Text('Dashboard'),
         actions: [
+          IconButton(
+            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: widget.toggleTheme,
+          ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
-              // Navigasi ke halaman login
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
+                MaterialPageRoute(
+                  builder: (context) => LoginPage(
+                    toggleTheme: widget.toggleTheme,
+                    isDarkMode: widget.isDarkMode,
+                  ),
+                ),
               );
             },
           ),
@@ -76,12 +118,16 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('Nama Pengguna'), // Nama pengguna
-              accountEmail: Text('email@domain.com'), // Email pengguna
+              accountName: Text(userName),
+              accountEmail: Text(userEmail),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150', // Ganti dengan URL foto pengguna
-                ),
+                radius: 80, // Ukuran lingkaran lebih besar
+                backgroundImage: userPhoto.isNotEmpty
+                    ? NetworkImage(userPhoto)
+                    : null, // Gunakan NetworkImage jika URL tersedia
+                child: userPhoto.isEmpty
+                    ? Icon(Icons.person, size: 80)
+                    : null, // Gunakan ikon default jika foto kosong
               ),
             ),
             ListTile(
@@ -91,8 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        CartPage(userId: 1), // Ganti userId sesuai login
+                    builder: (context) => CartPage(userId: widget.userId),
                   ),
                 );
               },
@@ -104,160 +149,90 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RiwayatBelanjaPage(
-                        userId: 1), // Ganti userId sesuai login
+                    builder: (context) =>
+                        RiwayatBelanjaPage(userId: widget.userId),
                   ),
                 );
               },
             ),
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Setting'),
-              onTap: () {
-                // Tambahkan logika untuk navigasi ke halaman pengaturan
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.login),
-              title: Text('Halaman Login'),
-              onTap: () {
-                // Navigasi ke halaman login
-                Navigator.pushReplacement(
+              title: Text('Pengaturan'),
+              onTap: () async {
+                final updatedData = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(
+                      toggleTheme: widget.toggleTheme,
+                      isDarkMode: widget.isDarkMode,
+                      userId: widget.userId,
+                      currentName: userName,
+                      currentEmail: userEmail,
+                      currentPhoto: userPhoto,
+                    ),
+                  ),
                 );
+                if (updatedData != null) {
+                  setState(() {
+                    userName = updatedData['name'] ?? userName;
+                    userEmail = updatedData['email'] ?? userEmail;
+                    userPhoto = updatedData['photo'] ?? userPhoto;
+                  });
+                }
               },
             ),
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(
+                      toggleTheme: widget.toggleTheme,
+                      isDarkMode: widget.isDarkMode,
+                    ),
+                  ),
+                );
               },
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Selamat Berbelanja',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : errorMessage.isNotEmpty
-                      ? Center(
-                          child: Text(errorMessage)) // Menampilkan pesan error
-                      : GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.75,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(child: Text(errorMessage))
+              : GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return Card(
+                      elevation: 4,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Image.network(
+                              product['image'] ?? '',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.broken_image, size: 50);
+                              },
+                            ),
                           ),
-                          itemCount: products.length,
-                          itemBuilder: (context, index) {
-                            final product = products[index];
-                            return Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(10),
-                                      ),
-                                      child: Image.network(
-                                        product['image'],
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.error,
-                                            size: 100,
-                                            color: Colors.red,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          product['product'],
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        // Gunakan format angka untuk harga
-                                        Text(
-                                          formatCurrency(product['price']),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                        SizedBox(height: 8),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProductDetailPage(
-                                                  productName:
-                                                      product['product'] ??
-                                                          'Unknown Product',
-                                                  productPrice: formatCurrency(
-                                                      product['price'] ?? '0'),
-                                                  productImage:
-                                                      product['image'] ?? '',
-                                                  productDescription:
-                                                      product['description'] ??
-                                                          'No description',
-                                                  productId:
-                                                      product['idproduct'] ??
-                                                          '0',
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Text('Beli'),
-                                          style: ElevatedButton.styleFrom(
-                                            minimumSize:
-                                                Size(double.infinity, 36),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
-      ),
+                          Text(product['product'] ?? "Produk"),
+                          Text("Rp ${product['price']}"),
+                        ],
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
