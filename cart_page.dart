@@ -20,7 +20,7 @@ class _CartPageState extends State<CartPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            '/lat_login/get_cart.php?user_id=${widget.userId}'),
+            'http://192.168.1.2/lat_login/get_cart.php?user_id=${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
@@ -85,6 +85,35 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
+  Future<void> showDeleteConfirmation(
+      BuildContext context, String idproduct) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Konfirmasi Penghapusan'),
+        content: Text('Apakah Anda yakin ingin menghapus barang ini?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, false); // Tidak menghapus
+            },
+            child: Text('Tidak'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, true); // Menghapus
+            },
+            child: Text('Ya'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      await updateQuantity(idproduct, 0); // Hapus item dari keranjang
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -117,6 +146,9 @@ class _CartPageState extends State<CartPage> {
                                 if (item.quantity > 1) {
                                   updateQuantity(
                                       item.idproduct, item.quantity - 1);
+                                } else {
+                                  showDeleteConfirmation(
+                                      context, item.idproduct);
                                 }
                               },
                             ),
