@@ -1,5 +1,4 @@
 <?php
-// Mengatur header agar dapat diakses oleh berbagai sumber (CORS)
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -62,3 +61,4 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $response['message'] = "Permintaan tidak valid.";
     echo json_encode($response);
 }
+?>
