@@ -1,4 +1,5 @@
 import 'cart_page.dart';
+import 'settings_page.dart';
 import 'RiwayatBelanjaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -112,20 +113,10 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Setting'),
+              title: Text('Pengaturan'),
               onTap: () {
-                // Tambahkan logika untuk navigasi ke halaman pengaturan
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.login),
-              title: Text('Halaman Login'),
-              onTap: () {
-                // Navigasi ke halaman login
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()));
               },
             ),
             ListTile(

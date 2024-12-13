@@ -7,6 +7,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 // Menghubungkan ke database
 require "db_connection.php";
 
+// Memeriksa metode request
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $response = array(); // Inisialisasi array untuk menyimpan respon
 
@@ -30,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             // Jika password cocok, login berhasil
             $response['value'] = 1;
             $response['message'] = 'Login Berhasil';
+            $response['user_id'] = $row['id'];  // Kirimkan ID pengguna
         } else {
             // Jika password tidak cocok
             $response['value'] = 0;
@@ -38,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     } else {
         // Jika email tidak ditemukan di database
         $response['value'] = 0;
-        $response['message'] = 'Login gagal. email tidak ditemukan.';
+        $response['message'] = 'Login gagal. Email tidak ditemukan.';
     }
 
     // Mengembalikan respon dalam format JSON

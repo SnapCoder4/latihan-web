@@ -51,7 +51,15 @@ class _RiwayatBelanjaPageState extends State<RiwayatBelanjaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Riwayat Belanja')),
+      appBar: AppBar(
+        title: Text('Riwayat Belanja'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous page
+          },
+        ),
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty

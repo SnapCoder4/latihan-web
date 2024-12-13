@@ -1,91 +1,80 @@
 import 'dart:convert';
-import 'package:latlogin/login.dart';
+import 'dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class RegisterPage extends StatefulWidget {
+class EditProfilePage extends StatefulWidget {
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _EditProfilePageState createState() => _EditProfilePageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
   final TextEditingController _teleponController = TextEditingController();
   String _message = '';
 
-  Future<void> _register() async {
-    final email = _emailController.text;
-    final password = _passwordController.text;
+  // Method untuk mengupdate profil
+  Future<void> _updateProfile() async {
+    // Ambil ID pengguna dari SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('user_id') ?? '';
+
     final nama = _namaController.text;
     final alamat = _alamatController.text;
     final telepon = _teleponController.text;
 
-    var uri = Uri.parse(
-        "http://localhost/UASPWM/register.php"); // Sesuaikan dengan URL API Anda
+    var uri = Uri.parse("http://localhost/UASPWM/editprofil.php");
 
-    var response = await http.post(uri, body: {
-      'email': email,
-      'password': password,
-      'nama': nama,
-      'alamat': alamat,
-      'telepon': telepon,
-    });
+    try {
+      var response = await http.post(uri, body: {
+        'id': userId, // Kirim ID pengguna
+        'nama': nama,
+        'alamat': alamat,
+        'telepon': telepon,
+      });
 
-    if (response.statusCode == 200) {
-      var jsonData = jsonDecode(response.body);
+      print('Response body: ${response.body}'); // Debugging response
 
-      if (jsonData['value'] == 1) {
-        setState(() {
-          _message = "Registration successful!";
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+
+        if (jsonData['value'] == 1) {
+          setState(() {
+            _message = "Profile updated successfully!";
+          });
+
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
+            MaterialPageRoute(builder: (context) => DashboardPage()),
           );
-        });
+        } else {
+          setState(() {
+            _message = "Error updating profile: ${jsonData['message']}";
+          });
+        }
       } else {
         setState(() {
-          _message = "Registration Success";
+          _message =
+              "Error: Failed to update profile. Status code: ${response.statusCode}";
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        _message = "Error during registration";
+        _message =
+            "Error: Failed to connect to the server. Please try again later.";
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Register'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous page
-          },
-        ),
-      ),
+      appBar: AppBar(title: Text('Edit Profile')),
       body: Stack(
         children: [
-          // Background Image
-          Container(
-            width: screenWidth,
-            height: screenHeight,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          // Form Register
+          // Form Edit Profile
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -94,33 +83,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 16.0),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 16.0),
-                      ),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 16),
                     TextField(
                       controller: _namaController,
                       decoration: InputDecoration(
@@ -162,13 +124,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: _register,
+                      onPressed: _updateProfile,
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      child: Text('Register'),
+                      child: Text('Update Profile'),
                     ),
                     SizedBox(height: 16),
                     Text(

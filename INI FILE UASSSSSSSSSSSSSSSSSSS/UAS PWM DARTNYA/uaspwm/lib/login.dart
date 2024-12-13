@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'register_page.dart'; // Impor halaman register
 import 'dashboard_page.dart'; // Impor halaman dashboard
+import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password_page.dart'; // Impor halaman lupa password
 
 class LoginPage extends StatefulWidget {
@@ -20,7 +21,6 @@ class _LoginPageState extends State<LoginPage> {
     final String email = _emailController.text;
     final String password = _passwordController.text;
 
-    // URL endpoint API login
     final String url = 'http://localhost/UASPWM/login.php';
 
     try {
@@ -35,13 +35,15 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         if (jsonResponse['value'] == 1) {
-          // Jika login berhasil
+          // Menyimpan ID pengguna ke SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('user_id', jsonResponse['user_id']);
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => DashboardPage()),
           );
         } else {
-          // Jika login gagal
           setState(() {
             _message = jsonResponse['message'];
           });
