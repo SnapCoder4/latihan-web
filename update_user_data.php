@@ -76,3 +76,4 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $response['message'] = "Metode request tidak valid.";
     echo json_encode($response);
 }
+?>
