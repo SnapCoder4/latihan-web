@@ -5,6 +5,7 @@ import 'login.dart';
 import 'settings_page.dart';
 import 'cart_page.dart';
 import 'RiwayatBelanjaPage.dart';
+import 'productdetailpage.dart'; // Pastikan nama file sesuai dengan nama file sebenarnya
 
 class DashboardPage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -45,18 +46,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
-        if (data['value'] == 1) {
-          setState(() {
-            userName = data['nama'] ?? "Nama Pengguna";
-            userEmail = data['email'] ?? "email@domain.com";
-            userPhoto = data['foto'] ?? ""; // URL foto pengguna
-          });
-        } else {
-          setState(() {
-            errorMessage = data['message'];
-          });
-        }
+        setState(() {
+          userName = data['nama'] ?? "Nama Pengguna";
+          userEmail = data['email'] ?? "email@domain.com";
+          userPhoto = data['foto'] ?? ""; // URL foto pengguna
+        });
       } else {
         print("Gagal mengambil data pengguna: ${response.body}");
       }
@@ -84,6 +78,17 @@ class _DashboardPageState extends State<DashboardPage> {
       setState(() {
         isLoading = false;
         errorMessage = e.toString();
+      });
+    }
+  }
+
+  // Update data profil setelah diedit
+  Future<void> _handleProfileUpdated(dynamic updatedData) async {
+    if (updatedData != null) {
+      setState(() {
+        userName = updatedData['name'] ?? userName;
+        userEmail = updatedData['email'] ?? userEmail;
+        userPhoto = updatedData['photo'] ?? userPhoto;
       });
     }
   }
@@ -121,12 +126,12 @@ class _DashboardPageState extends State<DashboardPage> {
               accountName: Text(userName),
               accountEmail: Text(userEmail),
               currentAccountPicture: CircleAvatar(
-                radius: 80, // Ukuran lingkaran lebih besar
+                radius: 60, // Ukuran lingkaran lebih besar
                 backgroundImage: userPhoto.isNotEmpty
                     ? NetworkImage(userPhoto)
                     : null, // Gunakan NetworkImage jika URL tersedia
                 child: userPhoto.isEmpty
-                    ? Icon(Icons.person, size: 80)
+                    ? Icon(Icons.person, size: 60)
                     : null, // Gunakan ikon default jika foto kosong
               ),
             ),
@@ -172,13 +177,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                 );
-                if (updatedData != null) {
-                  setState(() {
-                    userName = updatedData['name'] ?? userName;
-                    userEmail = updatedData['email'] ?? userEmail;
-                    userPhoto = updatedData['photo'] ?? userPhoto;
-                  });
-                }
+                await _handleProfileUpdated(updatedData);
               },
             ),
             ListTile(
@@ -213,22 +212,40 @@ class _DashboardPageState extends State<DashboardPage> {
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
-                    return Card(
-                      elevation: 4,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Image.network(
-                              product['image'] ?? '',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.broken_image, size: 50);
-                              },
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailPage(
+                              productName: product['product'] ?? "Produk",
+                              productPrice: product['price'].toString(),
+                              productImage: product['image'] ?? "",
+                              productId: product['idproduct'] ?? "",
+                              productDescription: product['description'] ??
+                                  "Deskripsi tidak tersedia",
+                              userId: widget.userId, // Pastikan userId dikirim
                             ),
                           ),
-                          Text(product['product'] ?? "Produk"),
-                          Text("Rp ${product['price']}"),
-                        ],
+                        );
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Image.network(
+                                product['image'] ?? '',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(Icons.broken_image, size: 50);
+                                },
+                              ),
+                            ),
+                            Text(product['product'] ?? "Produk"),
+                            Text("Rp ${product['price']}"),
+                          ],
+                        ),
                       ),
                     );
                   },
