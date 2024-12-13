@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ChangePasswordPage extends StatefulWidget {
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
   final String email;
 
-  ChangePasswordPage({required this.email});
+  ChangePasswordPage(
+      {required this.email,
+      required this.isDarkMode,
+      required this.toggleTheme});
 
   @override
   _ChangePasswordPageState createState() => _ChangePasswordPageState();
@@ -36,7 +41,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
 
-    final String url = 'http://localhost/UASPWM/resetform.php';
+    final String url = 'http://192.168.0.149/UASPWM/resetform.php';
 
     try {
       final response = await http.post(
@@ -54,7 +59,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             _message = "Password berhasil diubah, silakan login kembali.";
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
+              MaterialPageRoute(
+                  builder: (context) => LoginPage(
+                      toggleTheme: widget.toggleTheme,
+                      isDarkMode: widget.isDarkMode)),
             );
           });
         } else {
@@ -92,7 +100,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/background.jpg',
               fit: BoxFit.cover,
             ),
           ),

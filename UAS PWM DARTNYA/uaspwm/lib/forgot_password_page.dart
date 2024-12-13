@@ -4,6 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:latlogin/verification.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+
+  ForgotPasswordPage({required this.isDarkMode, required this.toggleTheme});
   @override
   _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
 }
@@ -20,7 +24,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     });
 
     final String email = _emailController.text;
-    final String url = 'http://localhost/UASPWM/resetpassword.php';
+    final String url = 'http://192.168.0.149/UASPWM/resetpassword.php';
 
     try {
       final response = await http.post(
@@ -34,7 +38,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => VerificationPage(email: email)),
+                builder: (context) => VerificationPage(
+                    email: email,
+                    toggleTheme: widget.toggleTheme,
+                    isDarkMode: widget.isDarkMode)),
           );
         } else {
           setState(() {
@@ -72,7 +79,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/background.jpg',
               fit: BoxFit.cover,
             ),
           ),

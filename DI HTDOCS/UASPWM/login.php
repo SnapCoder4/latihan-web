@@ -21,8 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Menjalankan query
     $result = mysqli_query($connect, $cek);
 
+    // Periksa apakah query berhasil
+    if (!$result) {
+        echo json_encode(array(
+            "value" => 0,
+            "message" => "Kesalahan pada query database: " . mysqli_error($connect)
+        ));
+        exit();
+    }
+
     // Mengecek apakah hasil query valid
-    if ($result && mysqli_num_rows($result) > 0) {
+    if (mysqli_num_rows($result) > 0) {
         // Mengambil data pengguna dari database
         $row = mysqli_fetch_assoc($result);
 

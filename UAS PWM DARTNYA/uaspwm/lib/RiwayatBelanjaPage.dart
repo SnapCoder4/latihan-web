@@ -20,21 +20,37 @@ class _RiwayatBelanjaPageState extends State<RiwayatBelanjaPage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://localhost/UASPWM/get_riwayat_belanja.php?user_id=${widget.userId}',
+          'http://192.168.0.149/UASPWM/get_riwayat_belanja.php?user_id=${widget.userId}',
         ),
       );
 
       if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        // Check if the response is a list or a map with an error message
+        if (responseData is List) {
+          setState(() {
+            purchaseHistory = responseData;
+            isLoading = false;
+          });
+        } else if (responseData is Map && responseData.containsKey('message')) {
+          setState(() {
+            errorMessage = responseData['message'];
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            errorMessage = 'Unexpected response format';
+            isLoading = false;
+          });
+        }
+      } else {
         setState(() {
-          purchaseHistory = json.decode(response.body);
+          errorMessage = 'Failed to load purchase history';
           isLoading = false;
         });
-      } else {
-        print('Error fetching data: ${response.body}');
-        throw Exception('Failed to load purchase history');
       }
     } catch (e) {
-      print('Error: $e');
       setState(() {
         isLoading = false;
         errorMessage = e.toString();

@@ -9,6 +9,16 @@ import 'productdetailpage.dart'; // Impor halaman ProductDetailPage
 import 'package:intl/intl.dart'; // Impor intl untuk memformat angka
 
 class DashboardPage extends StatefulWidget {
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+  final int userId;
+
+  DashboardPage({
+    required this.toggleTheme,
+    required this.isDarkMode,
+    required this.userId,
+  });
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
@@ -17,13 +27,44 @@ class _DashboardPageState extends State<DashboardPage> {
   List products = [];
   bool isLoading = true; // Menyimpan status loading
   String errorMessage = ''; // Menyimpan pesan error jika ada
+  String userName = "Nama Pengguna";
+  String userEmail = "email@domain.com";
+  String userPhoto = ""; // URL foto pengguna
+
+  Future<void> fetchUserData() async {
+    final uri = Uri.parse(
+        'http://192.168.0.149/UASPWM/get_user_data.php?user_id=${widget.userId}');
+    try {
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['value'] == 1) {
+          setState(() {
+            userName = data['nama'] ?? "Nama Pengguna";
+            userEmail = data['email'] ?? "email@domain.com";
+            userPhoto = data['foto'] ?? ""; // URL foto pengguna
+          });
+        } else {
+          setState(() {
+            errorMessage = data['message'];
+          });
+        }
+      } else {
+        print("Gagal mengambil data pengguna: ${response.body}");
+      }
+    } catch (e) {
+      print("Kesalahan jaringan saat mengambil data pengguna: $e");
+    }
+  }
 
   // Fungsi untuk mengambil data produk dari API
   Future<void> fetchProducts() async {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://localhost/UASPWM//get_products.php'), // Ganti dengan URL API Anda
+            'http://192.168.0.149/UASPWM/get_products.php'), // Ganti dengan URL API Anda
       );
 
       if (response.statusCode == 200) {
@@ -46,7 +87,8 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    fetchProducts(); // Panggil fungsi untuk mengambil data saat widget diinisialisasi
+    fetchUserData();
+    fetchProducts();
   }
 
   // Fungsi untuk memformat harga
@@ -60,29 +102,21 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard Produk'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              // Navigasi ke halaman login
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
-          ),
-        ],
       ),
       drawer: Drawer(
         child: Column(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('Nama Pengguna'), // Nama pengguna
-              accountEmail: Text('email@domain.com'), // Email pengguna
+              accountName: Text(userName),
+              accountEmail: Text(userEmail),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150', // Ganti dengan URL foto pengguna
-                ),
+                radius: 80, // Ukuran lingkaran lebih besar
+                backgroundImage: userPhoto.isNotEmpty
+                    ? NetworkImage(userPhoto)
+                    : null, // Gunakan NetworkImage jika URL tersedia
+                child: userPhoto.isEmpty
+                    ? Icon(Icons.person, size: 80)
+                    : null, // Gunakan ikon default jika foto kosong
               ),
             ),
             ListTile(
@@ -92,8 +126,9 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        CartPage(userId: 1), // Ganti userId sesuai login
+                    builder: (context) => CartPage(
+                        userId:
+                            widget.userId), // Menggunakan userId dari widget
                   ),
                 );
               },
@@ -106,7 +141,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => RiwayatBelanjaPage(
-                        userId: 1), // Ganti userId sesuai login
+                        userId:
+                            widget.userId), // Menggunakan userId dari widget
                   ),
                 );
               },
@@ -115,16 +151,28 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: Icon(Icons.settings),
               title: Text('Pengaturan'),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingsPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SettingsPage(
+                            toggleTheme: widget.toggleTheme,
+                            isDarkMode: widget.isDarkMode,
+                            userId: widget.userId,
+                            currentName: userName,
+                            currentEmail: userEmail,
+                            currentPhoto: userPhoto)));
               },
             ),
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginPage(
+                            toggleTheme: widget.toggleTheme,
+                            isDarkMode: widget.isDarkMode)));
               },
             ),
           ],
@@ -198,7 +246,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                           ),
                                         ),
                                         SizedBox(height: 4),
-                                        // Gunakan format angka untuk harga
                                         Text(
                                           formatCurrency(product['price']),
                                           style: TextStyle(

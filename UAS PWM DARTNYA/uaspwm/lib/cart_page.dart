@@ -20,7 +20,7 @@ class _CartPageState extends State<CartPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://localhost/UASPWM/get_cart.php?user_id=${widget.userId}'),
+            'http://192.168.0.149/UASPWM/get_cart.php?user_id=${widget.userId}'),
       );
 
       if (response.statusCode == 200) {
@@ -46,7 +46,7 @@ class _CartPageState extends State<CartPage> {
   Future<void> updateQuantity(String idproduct, int quantity) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/UASPWM/update_cart_quantity.php'),
+        Uri.parse('http://192.168.0.149/UASPWM/update_cart_quantity.php'),
         body: {
           'user_id': widget.userId.toString(),
           'idproduct': idproduct,
@@ -65,7 +65,7 @@ class _CartPageState extends State<CartPage> {
   Future<void> checkout() async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/UASPWM/checkout.php'),
+        Uri.parse('http://192.168.0.149/UASPWM/checkout.php'),
         body: {'user_id': widget.userId.toString()},
       );
 

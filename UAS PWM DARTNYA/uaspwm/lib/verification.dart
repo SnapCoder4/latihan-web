@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class VerificationPage extends StatefulWidget {
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
   final String email;
 
-  VerificationPage({required this.email});
+  VerificationPage(
+      {required this.email,
+      required this.isDarkMode,
+      required this.toggleTheme});
 
   @override
   _VerificationPageState createState() => _VerificationPageState();
@@ -28,7 +33,7 @@ class _VerificationPageState extends State<VerificationPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/UASPWM/verifycode.php'),
+        Uri.parse('http://192.168.0.149/UASPWM/verifycode.php'),
         body: {
           'verification_code': verificationCode,
           'email': widget.email,
@@ -45,7 +50,10 @@ class _VerificationPageState extends State<VerificationPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => ChangePasswordPage(email: widget.email)),
+                builder: (context) => ChangePasswordPage(
+                    email: widget.email,
+                    toggleTheme: widget.toggleTheme,
+                    isDarkMode: widget.isDarkMode)),
           );
         }
       } else {
@@ -78,7 +86,7 @@ class _VerificationPageState extends State<VerificationPage> {
           // Gambar latar belakang
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/background.jpg',
               fit: BoxFit.cover,
             ),
           ),

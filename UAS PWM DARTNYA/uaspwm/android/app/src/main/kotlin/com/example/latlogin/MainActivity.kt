@@ -1,4 +1,4 @@
-package com.example.latlogin
+package com.example.TechZone
 
 import io.flutter.embedding.android.FlutterActivity
 

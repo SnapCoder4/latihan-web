@@ -51,7 +51,7 @@ class _StoreRatingsPageState extends State<StoreRatingsPage> {
                       style: TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 16),

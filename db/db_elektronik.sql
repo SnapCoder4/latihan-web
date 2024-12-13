@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2024 at 11:23 AM
+-- Generation Time: Dec 13, 2024 at 06:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -53,9 +53,17 @@ CREATE TABLE `jual` (
 --
 
 INSERT INTO `jual` (`idjual`, `tgljual`, `idproduct`, `price`, `quantity`) VALUES
-('', '2024-12-11', 'P202409003', 900000, 1),
-('J001', '2024-12-05', 'P202409002', 379000, 2),
-('J002', '2024-12-05', 'P202409002', 379000, 1);
+('', '2024-12-13', 'P202409001', 13999000, 1),
+('J001', '2024-12-13', 'P202409002', 379000, 1),
+('J002', '2024-12-13', 'P202409002', 379000, 1),
+('J003', '2024-12-13', 'P202409002', 379000, 1),
+('J004', '2024-12-13', 'P202409001', 3588899, 1),
+('J005', '2024-12-13', 'P202409001', 3588899, 10),
+('J006', '2024-12-13', 'P202409001', 3588899, 2),
+('J007', '2024-12-13', 'P202409001', 3588899, 2),
+('J008', '2024-12-13', 'P202409002', 379000, 3),
+('J010', '2024-12-14', 'P202409004', 30990000, 5),
+('J011', '2024-12-14', 'P202409005', 29999000, 5);
 
 -- --------------------------------------------------------
 
@@ -76,18 +84,12 @@ CREATE TABLE `namaproduct` (
 --
 
 INSERT INTO `namaproduct` (`idproduct`, `product`, `price`, `image`, `description`) VALUES
-('P202409001', 'Tote Bag', 3588899, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-tote-bag-charles-jenis.jpg?v=1490883290', 'Jika Anda kerap membawa banyak barang ketika bepergian, tote bag dapat menjadi pilihan yang tepat. Karena tas yang satu ini bisa memuat banyak barang dan bisa dijinjing dengan satu tangan. Aneka bahan populer untuk tote bag antara lain kulit, rajut, dan kanvas. '),
-('P202409002', 'Handbag', 379000, 'https://rtwcreation.com/cdn/shop/files/maroon-classic-handbag-with-blooming-flower-quater.jpg?v=1695717449', 'Handbag selempang wanita ini adalah tas bahu yang trendi dengan desain modis dan fungsional. Terbuat dari bahan PU yang berkualitas.'),
-('P202409003', 'Backpack', 900000, 'https://solo-ny.com/cdn/shop/files/UBN795-10_HO_c4f17d2f-425f-4fa9-98c1-dc3f06b1933a.jpg?v=1695141176&width=1080', 'Tas ransel backpack pria - Tas ransel cowok - koleksi import pilihan tas ransel, tas laptop, tas Anti Theft Anti Maling, dengan USB port dan multi fungsi.'),
-('P202409004', 'Clutch', 700000, 'https://images.tokopedia.net/img/cache/500-square/VqbcmM/2021/4/24/8e948199-5ff4-4480-bf8d-fd4dfc000aa0.jpg', 'Tas Clutch Selempang Wanita Import ini adalah tas yang sangat mewah dan elegan, cocok untuk digunakan pada acara pesta. Terbuat dari bahan kain yang berkualitas tinggi.'),
-('P202409005', 'Quilted Bag', 2000000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-quilted-bag-chanel.jpg?v=1490881665', 'Quilted bag merujuk pada model tas dengan bahan yang dijahit menyerupai selimut dari kain perca. Jadi semua jenis tas, baik berbahan kulit atau kain yang bermotif seperti ini bisa disebut quilted bag (seperti yang bisa kita lihat di gambar) '),
-('P202409006', 'Shopper Bag', 500000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/shopper-bag-tas-jenis.jpg?v=1490883508', 'Jika dilihat sekilas, shopper bag memang mirip tote bag dan banyak model tote bag yang bisa juga disebut shopper bag.  Namun sering bagian talinya lebih besar dan bisa memuat banyak barang. Kaum wanita senior kerap menyukai jenis tas ini karena dianggap berkelas dan tak pernah ketinggalan zaman.'),
-('P202409007', 'Hobo Bag', 650000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-hobo-bag.jpg?v=1490879252', 'Tak sekadar menarik dilihat, tas ini juga tergolong kuat karena beban barang bawaan tersebar merata pada badan dan tali tas.'),
-('P202409008', 'Trapezoid Bag', 2500000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-trapezoid-jenis-tas.jpg?v=1490883802', 'Trapezoid adalah model tas yang pada bentuknya yang mirip dengan trapesium.  Tas Trapezoid bisa memiliki sisi trapezium bagian atas yang lebih pendek ataupun yang lebih panjang seperti di foto.'),
-('P202409009', 'Pouch Wallet', 2300000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/pouch-wallet-jenis-tas_9d92f74d-0df0-48a8-b1fd-d45af25ffaf8.jpg?v=1490885420', 'Pouch wallet berukuran kecil cocok digunakan Anda acara santai dan hangout dengan teman. Ukurannya pas untuk memuat HP, kartu kredit dan item kecil lain seperti kunci dsb.  Pouch wallet adalah item alternatifnya dompet formal terutama untuk suasana yang lebih casual.'),
-('P202409010', 'Flight Bag', 3000000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-flight-bag-1.jpg?v=1490884737', 'Flight bag adalah istilah jenis tas yang dibawa ke dalam kabin pesawat saat berpergian. Tas flight bag beraneka ragam bentuk, design dan bahannya. Ada yang memiliki design formal ada juga yang casual seperti pada gambar (foto). '),
-('P202409011', 'Swagger', 3200000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-swagger-bag-coach-jenis.jpg?v=1490880737', 'Swagger bag adalah signature style dari tas branded Coach. Tas ini memiliki keistimewaan berupa lempeng besi yang menjadi aksen pemanis. Variasi warna, ukuran, dan bahan swagger bag masih menjadi model klasik yang disukai banyak wanita.'),
-('P202409012', 'Structured Bag', 2700000, 'https://cdn.shopify.com/s/files/1/0366/9825/files/tas-structured-bag-mk-jenis.jpg?v=1490884444', 'Structured bag adalah istilah untuk semua jenis tas tangan yang kalau tidak diisi barang pun tetap berbentuk atau tidak pipih.');
+('P202409001', 'Laptop Axioo Pongo 725', 13999000, 'https://images.tokopedia.net/img/cache/900/VqbcmM/2023/12/9/9a87d55b-7c24-4f0a-9b9a-76bf12498c26.png', 'Laptop Axioo Pongo 725 hadir dengan performa tinggi berkat prosesor Intel Core i7-12650H, RAM 16GB, dan SSD 512GB untuk kecepatan multitasking dan penyimpanan. Didukung GPU NVIDIA GeForce RTX 2050 4GB, laptop ini menawarkan grafis memukau untuk gaming dan desain. Dengan layar Full HD 15,6 inci, desain modern, serta sistem operasi Windows 11, Axioo Pongo 725 cocok untuk kebutuhan profesional, kreatif, dan hiburan, menjadikannya pilihan andal untuk segala aktivitas.\r\n'),
+('P202409002', 'Asus ROG Zephyrus G14\r\n', 38999000, 'https://images.tokopedia.net/img/cache/900/VqbcmM/2024/12/2/597a71ee-a825-4203-a931-142a1d5fd00b.jpg', 'ASUS ROG Zephyrus G14 GA403UV adalah laptop gaming premium dengan prosesor AMD Ryzen 9 8945HS dan NVIDIA GeForce RTX 4060. Dilengkapi dengan 32GB RAM dan 1TB SSD, serta layar 3K OLED untuk visual tajam, laptop ini ideal untuk multitasking dan gaming. Dengan Windows 11 dan One-Handed Keyboard (OHS), G14 menawarkan kenyamanan dan performa tinggi dalam desain kompak dan elegan.'),
+('P202409003', 'ACER SWIFT 3 INFINITY 4 ', 12899000, 'https://images.tokopedia.net/img/cache/900/VqbcmM/2022/1/29/cf9ad817-f878-4c62-96a0-e696febc5238.png', 'Acer Swift 3 Infinity 4 SF314 adalah laptop tipis dengan Intel Core i7-1165G7 dan Intel Iris Xe untuk performa cepat. Dilengkapi dengan 16GB RAM dan 512GB SSD, serta Windows 11 dan One-Handed Keyboard (OHS), laptop ini ideal untuk multitasking dan produktivitas. Desain elegan dan portabilitas tinggi membuatnya sempurna untuk profesional dan pelajar.'),
+('P202409004', 'iPhone 15 Pro Max 1TB\r\n', 30990000, 'https://www.bhinneka.com/blog/wp-content/uploads/2023/02/Hp-termahal-iPhone-15-Pro-Max-terbaru-2023-404x500.jpg', 'iPhone 15 Pro Max 1TB hadir dengan chip A17 Pro untuk performa cepat dan efisien. Dengan 1TB penyimpanan, layar Super Retina XDR OLED 6,7 inci yang tajam, dan kamera utama 48MP, ponsel ini ideal untuk foto, video, dan gaming. Didukung oleh iOS 17, baterai tahan lama, dan konektivitas 5G, iPhone 15 Pro Max menawarkan pengalaman premium dengan desain elegan.'),
+('P202409005', 'Samsung Galaxy Z Fold 5 1TB\r\n', 29999000, 'https://www.bhinneka.com/blog/wp-content/uploads/2023/08/Hp-Samsung-Terbaru-Galaxy-Z-Fold-5-2023-492x500.jpg', 'Samsung Galaxy Z Fold 5 1TB adalah smartphone lipat premium dengan layar utama 7,6 inci Dynamic AMOLED 2X dan layar luar 6,2 inci. Ditenagai oleh Snapdragon 8 Gen 2, ponsel ini menawarkan performa cepat untuk gaming dan produktivitas. Dengan 1TB penyimpanan dan kamera 50MP, Z Fold 5 memberikan pengalaman fotografi dan hiburan profesional. Desain elegan dan portabilitas tinggi menjadikannya pilihan sempurna bagi pengguna yang membutuhkan perangkat inovatif dan multifungsi.'),
+('P202409006', 'ASUS ROG Phone 7 Ultimate', 18999000, 'https://www.bhinneka.com/blog/wp-content/uploads/2023/02/Hp-gaming-termahal-asus-rog-phone-7-ultimate-395x500.jpg', '**ASUS ROG Phone 7 Ultimate** adalah smartphone gaming dengan **Snapdragon 8 Gen 2**, **6,78 inci AMOLED 165Hz**, dan **16GB RAM**. Dilengkapi dengan **512GB penyimpanan**, sistem pendingin canggih, dan baterai besar, ponsel ini ideal untuk gaming intensif. Kamera **50MP** dan desain futuristik menambah kesan premium pada perangkat ini.');
 
 -- --------------------------------------------------------
 
@@ -109,7 +111,7 @@ CREATE TABLE `riwayat_belanja` (
 --
 
 CREATE TABLE `users` (
-  `id` varchar(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `email` text DEFAULT NULL,
   `password` text DEFAULT NULL,
   `nama` text DEFAULT NULL,
@@ -125,7 +127,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `nama`, `alamat`, `telepon`, `foto`, `createdDate`, `verification_code`) VALUES
-('I6229', 'herywijaya2709@gmail.com', '$2y$10$XhY86LDJnJFN.iDn71.TjOVeyh3mMZsdpBfSezvM/90iEygN8CsUG', 'hery', 'sssss', '11111', NULL, '2024-12-11 17:13:00', 0);
+(1935, 'herywijaya2709@gmail.com', '$2y$10$sYJhvNVqxp1XPkXH2lC6auzDhIgHwbtSzZQX8kbKsSSfDXArK8YZS', 'hery', 'a', '1', 'uploads/675c68e5415f4_1000068951.jpg', '2024-12-14 00:03:33', 152992),
+(2919, 'o', '$2y$10$1k/HU.ZjYI0X.phpAaAXAuksNz/p/wjwSiHExn6/b5f849Y9DcxPG', 'o', 'l', '99', 'uploads/675c37ee69028_1000068951.jpg', '2024-12-13 20:34:38', 0);
 
 --
 -- Indexes for dumped tables
@@ -173,7 +176,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `idcart` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idcart` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `riwayat_belanja`

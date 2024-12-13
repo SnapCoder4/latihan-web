@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'register_page.dart'; // Impor halaman register
+import 'register.dart'; // Impor halaman register
 import 'dashboard_page.dart'; // Impor halaman dashboard
-import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password_page.dart'; // Impor halaman lupa password
 
 class LoginPage extends StatefulWidget {
+  final VoidCallback toggleTheme; // Callback untuk mengganti tema
+  final bool isDarkMode; // Indikator apakah dark mode aktif
+
+  LoginPage({required this.toggleTheme, required this.isDarkMode});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -14,48 +18,67 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _obscureText = true; // Untuk menyembunyikan/menampilkan password
   String _message = '';
 
   Future<void> _login() async {
-    final String email = _emailController.text;
-    final String password = _passwordController.text;
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
 
-    final String url = 'http://localhost/UASPWM/login.php';
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        _message = 'Email dan password tidak boleh kosong.';
+      });
+      return;
+    }
+
+    final String url = 'http://192.168.0.149/UASPWM/login.php';
 
     try {
       final response = await http.post(
         Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
         body: {
           'email': email,
           'password': password,
         },
       );
 
+      print('Status Code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
+
         if (jsonResponse['value'] == 1) {
-          // Menyimpan ID pengguna ke SharedPreferences
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('user_id', jsonResponse['user_id']);
+          // Convert user_id from string to int
+          final int userId = int.parse(jsonResponse['user_id']);
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => DashboardPage()),
+            MaterialPageRoute(
+              builder: (context) => DashboardPage(
+                toggleTheme: widget.toggleTheme,
+                isDarkMode: widget.isDarkMode,
+                userId: userId,
+              ),
+            ),
           );
         } else {
           setState(() {
-            _message = jsonResponse['message'];
+            _message = jsonResponse['message'] ?? 'Login gagal.';
           });
         }
       } else {
         setState(() {
-          _message = 'Terjadi kesalahan, silakan coba lagi.';
+          _message = 'Terjadi kesalahan server. Kode: ${response.statusCode}';
         });
       }
     } catch (e) {
+      print('Error: $e');
       setState(() {
-        _message = 'Tidak dapat terhubung ke server.';
+        _message = 'Tidak dapat terhubung ke server. Periksa koneksi internet.';
       });
     }
   }
@@ -66,6 +89,15 @@ class _LoginPageState extends State<LoginPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Login'),
+        actions: [
+          IconButton(
+            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: widget.toggleTheme,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Gambar latar belakang
@@ -74,14 +106,12 @@ class _LoginPageState extends State<LoginPage> {
             height: screenHeight,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/images/background.png'), // Gambar background
+                image: AssetImage('assets/images/background.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-
-          // Konten halaman login di atas background
+          // Konten login
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -95,57 +125,55 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 24),
 
-                  // TextField email dengan desain kapsul dan ikon email
+                  // TextField email
                   SizedBox(
                     width: 300,
                     child: TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon: Icon(Icons.verified_user),
+                        prefixIcon: Icon(Icons.email),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 20),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
+                        fillColor: widget.isDarkMode
+                            ? Colors.grey[800]
+                            : Colors.white.withOpacity(0.8),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
                   SizedBox(height: 16),
 
-                  // TextField password dengan ikon mata untuk menampilkan/menyembunyikan password
+                  // TextField password
                   SizedBox(
                     width: 300,
                     child: TextField(
                       controller: _passwordController,
-                      obscureText: _obscureText,
+                      obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 20),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
+                        fillColor: widget.isDarkMode
+                            ? Colors.grey[800]
+                            : Colors.white.withOpacity(0.8),
+                      ),
+                      style: TextStyle(
+                        color: widget.isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
 
-                  // Link Lupa Password di bawah isian Password
+                  // Link lupa password
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -153,18 +181,24 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ForgotPasswordPage()),
+                            builder: (context) => ForgotPasswordPage(
+                              toggleTheme: widget.toggleTheme,
+                              isDarkMode: widget.isDarkMode,
+                            ),
+                          ),
                         );
                       },
                       child: Text(
                         'Lupa Password?',
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(
+                          color: widget.isDarkMode ? Colors.white : Colors.blue,
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(height: 16),
 
-                  // Tombol login dan register dalam satu row
+                  // Tombol login dan register
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -178,7 +212,11 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RegisterPage()),
+                              builder: (context) => RegisterPage(
+                                toggleTheme: widget.toggleTheme,
+                                isDarkMode: widget.isDarkMode,
+                              ),
+                            ),
                           );
                         },
                         child: Text('Register'),
@@ -188,59 +226,14 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 16),
 
                   // Pesan error
-                  Text(
-                    _message,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  SizedBox(height: 100),
-
-                  // Login dengan sosial media
-                  Text(
-                    "Atau login dengan",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {},
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              AssetImage('assets/images/google_logo.png'),
-                        ),
+                  if (_message.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Text(
+                        _message,
+                        style: TextStyle(color: Colors.red),
                       ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () {},
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              AssetImage('assets/images/facebook_logo.png'),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () {},
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              AssetImage('assets/images/linkedin_logo.png'),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      GestureDetector(
-                        onTap: () {},
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              AssetImage('assets/images/twitter_logo.png'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
                 ],
               ),
             ),

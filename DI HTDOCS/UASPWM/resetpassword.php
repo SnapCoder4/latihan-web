@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = '????@gmail.com'; /* INI GMAIL LU YANG ASLI */
-            $mail->Password = 'password'; /* INI GW SIH PAKE PASSWORD APLIKASI DARI GOOGLENYA BUKAN PASSWORD EMAIL ASLI */
+            $mail->Username = 'herywijaya2709@gmail.com'; /* INI GMAIL LU YANG ASLI */
+            $mail->Password = 'eqei mtmm zevb xrot'; /* INI GW SIH PAKE PASSWORD APLIKASI DARI GOOGLENYA BUKAN PASSWORD EMAIL ASLI */
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 

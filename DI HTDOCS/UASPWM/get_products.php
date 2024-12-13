@@ -4,19 +4,29 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require 'db_connection.php';
 
-$query = "SELECT * FROM namaproduct";  // Pastikan nama tabel sesuai dengan yang ada di database
-$result = mysqli_query($connect, $query);
+$response = array();
 
-if ($result) {
+try {
+    // Query untuk mengambil data produk
+    $query = "SELECT * FROM namaproduct"; // Pastikan nama tabel sesuai dengan database Anda
+    $result = mysqli_query($connect, $query);
+
+    if (!$result) {
+        throw new Exception("Query error: " . mysqli_error($connect));
+    }
+
     $products = array();
 
-    // Mengambil hasil query dalam array
+    // Ambil hasil query dalam bentuk array
     while ($row = mysqli_fetch_assoc($result)) {
         $products[] = $row;
     }
 
-    // Mengembalikan data produk sebagai JSON
+    // Kirimkan data produk sebagai JSON
     echo json_encode($products);
-} else {
-    echo json_encode(array("message" => "Error in query execution"));
+} catch (Exception $e) {
+    // Tangani error dengan respons JSON
+    $response['value'] = 0;
+    $response['message'] = $e->getMessage();
+    echo json_encode($response);
 }

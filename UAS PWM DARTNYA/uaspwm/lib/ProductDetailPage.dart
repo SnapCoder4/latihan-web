@@ -23,7 +23,7 @@ class ProductDetailPage extends StatelessWidget {
   Future<void> _addToCart(BuildContext context) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/UASPWM/add_to_cart.php'),
+        Uri.parse('http://192.168.0.149/UASPWM/add_to_cart.php'),
         body: {
           'user_id': '1', // Ganti dengan user_id yang sesuai
           'idproduct': productId,
